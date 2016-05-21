@@ -1,0 +1,4 @@
+*.[od]
+*.sw[op]
+ecs
+dev.sh
