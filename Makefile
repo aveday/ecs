@@ -1,6 +1,6 @@
 CXX := g++
 CPPFLAGS := -Wall -Wextra -std=c++11
-BIN := ecs
+BIN := test
 LDFLAGS := -lm -lglfw -lGL -lGLU -lGLEW
 RM:= rm -rf
 
