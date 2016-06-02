@@ -30,7 +30,7 @@ struct ECS {
 };
 
 #ifdef ECS_IMPLEMENTATION
-// Construct ECS with a list of systems
+/* Construct ECS with a list of systems */
 ECS::ECS(std::list<System*> systems)
 {
     for(auto system : systems)
@@ -44,13 +44,6 @@ int ECS::new_entity()
         return entity_count++;
     else
         exit(EXIT_FAILURE);
-}
-
-/* Get a reference to a component on an entity */
-template <typename T>
-T& ECS::get_component(int entity)
-{
-    return component_vector<T>[entity];
 }
 
 /* Add a new component to an entity */
@@ -75,12 +68,14 @@ void ECS::remove_component(int entity)
         entity_mask[entity] &= ~component_mask<T>;
 }
 
+/* Add and initialise a new System */
 void ECS::add_system(System *system)
 {
     systems.push_back(system);
     system->init(*this);
 }
 
+/* Run all systems in a loop */
 void ECS::run()
 {
     while (running) {
