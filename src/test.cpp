@@ -13,6 +13,7 @@ int main()
     // Create Entity-Component System and game entity
     ECS ecs({ new WindowSystem });
     auto game = ecs.new_entity();
+    auto player = ecs.new_entity();
 
     // Create a new game window
     ecs.add_component(game, WindowComponent{ "ECStest"} );

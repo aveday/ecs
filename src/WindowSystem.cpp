@@ -47,10 +47,10 @@ void WindowSystem::makeWindow(WindowComponent &window)
 
 void WindowSystem::step(ECS &ecs, int dt)
 {
-    auto mask = component_mask<WindowComponent>;
+    uint64_t mask = component_mask<WindowComponent>;
 
     for(int e = 0; e < ecs.entity_count; e++) {
-        if(~ecs.entity_mask[e] & mask) continue;
+        if( !ecs.check_mask(e, mask) ) continue;
 
         WindowComponent &window = component_vector<WindowComponent>[e];
         //TODO check resize
