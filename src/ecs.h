@@ -24,7 +24,6 @@ struct ECS {
 
     int new_entity();
     void add_system(System *system);
-    template <typename T> T& get_component(int entity);
     template <typename T> void add_component(int entity, T component);
     template <typename T> void remove_component(int entity);
 };
