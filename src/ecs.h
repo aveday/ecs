@@ -1,9 +1,11 @@
 #pragma once
+#include <iostream>
 #include <stdint.h>
 #include <stdlib.h>
 #include <vector>
 #include <list>
 #include "System.h"
+#include "Component.h"
 
 #define MAX_ENTS 10000
 
@@ -11,30 +13,21 @@ template <typename T> std::vector<T> component_vector;
 template <typename T> uint64_t component_mask;
 
 struct ECS {
+    void run();
     int entity_count = 0;
     int component_types = 0;
     bool running = true;
-
     std::vector<uint64_t> entity_mask = std::vector<uint64_t>(MAX_ENTS);
-
     std::list<System*> systems;
 
     ECS(std::list<System*> systems);
-    void run();
-
-    int new_entity();
     void add_system(System *system);
-    template <typename T> void add_component(int entity, T component);
-    template <typename T> void remove_component(int entity);
-};
 
-#ifdef ECS_IMPLEMENTATION
-/* Construct ECS with a list of systems */
-ECS::ECS(std::list<System*> systems)
-{
-    for(auto system : systems)
-        add_system(system);
-}
+    inline int new_entity();
+    template <typename T> inline void add_component(int entity, T component);
+    template <typename T> inline void remove_component(int entity);
+
+};
 
 /* Create a new entity, and return its ID */
 int ECS::new_entity()
@@ -55,7 +48,7 @@ void ECS::add_component(int entity, T component)
         component_vector<T> = std::vector<T>(MAX_ENTS);
     }
     // add component to vector and mark entity bitmask
-    component_vector<T>[entity] = component;
+    component_vector<T>[entity] = T(component);
     entity_mask[entity] |= component_mask<T>;
 }
 
@@ -66,6 +59,15 @@ void ECS::remove_component(int entity)
     if(component_mask<T>)
         entity_mask[entity] &= ~component_mask<T>;
 }
+
+#ifdef ECS_IMPLEMENTATION
+/* Construct ECS with a list of systems */
+ECS::ECS(std::list<System*> systems)
+{
+    for(auto system : systems)
+        add_system(system);
+}
+
 
 /* Add and initialise a new System */
 void ECS::add_system(System *system)

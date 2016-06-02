@@ -1,3 +1,4 @@
+#include <iostream>
 #include <stdio.h>
 #include "WindowSystem.h"
 
@@ -46,6 +47,8 @@ void WindowSystem::makeWindow(WindowComponent &window)
 
 void WindowSystem::step(ECS &ecs, int dt)
 {
+    auto mask = component_mask<WindowComponent>;
+
     for(int e = 0; e < ecs.entity_count; e++) {
         if(~ecs.entity_mask[e] & mask) continue;
 
