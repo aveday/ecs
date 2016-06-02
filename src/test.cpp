@@ -4,29 +4,24 @@
 #define ECS_IMPLEMENTATION
 #include "ecs.h"
 
-#include "config.h"
 #include "Component.h"
 #include "System.h"
 #include "WindowSystem.h"
 
 int main()
 {
-    auto ecs = ECS();
-    ecs.add_system(new WindowSystem);
-
+    // Create Entity-Component System and game entity
+    ECS ecs({ new WindowSystem });
     auto game = ecs.new_entity();
 
-    WindowComponent window = { "ECStest",
-            screen_width, screen_height,
-            FULLSCREEN, RESIZABLE, nullptr };
-
-    ecs.add_component(game, window);
-
+    // Create a new game window
+    ecs.add_component(game, WindowComponent{"ECStest"} );
+            
+    // Print debug info
     printf("%d\n", component_vector<WindowComponent>[game].width);
 
-    ecs.init();
-    ecs.run(1);
-
+    // Run ECS
+    ecs.run();
 
     return 0;
 }

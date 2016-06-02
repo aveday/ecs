@@ -44,14 +44,14 @@ void WindowSystem::makeWindow(WindowComponent &window)
     glDepthFunc(GL_LEQUAL);
 }
 
-void WindowSystem::run(ECS &ecs, int dt)
+void WindowSystem::step(ECS &ecs, int dt)
 {
     for(int e = 0; e < ecs.entity_count; e++) {
         if(~ecs.entity_mask[e] & mask) continue;
 
         WindowComponent &window = component_vector<WindowComponent>[e];
         //TODO check resize
-        //TODO do entity checking in System::run while looping through subsystems
+        //TODO do entity checking in System::step while looping through subsystems
         if (!window.gl_window)
             makeWindow(window);
 
