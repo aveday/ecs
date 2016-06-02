@@ -1,4 +1,5 @@
 *.[od]
 *.sw[op]
 ecs
+test
 dev.sh
