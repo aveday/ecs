@@ -1,21 +1,32 @@
 #include <stdio.h>
+#include <GL/glew.h>
+
+#define ECS_IMPLEMENTATION
 #include "ecs.h"
+
 #include "config.h"
 #include "Component.h"
-
-typedef struct { int a, b; } Component_A;
-typedef struct { int c, d; } Component_B;
+#include "System.h"
+#include "WindowSystem.h"
 
 int main()
 {
-    auto game = new_entity();
-    add_component( game, WindowComponent{
-            "ECStest", screen_width, screen_height,
-            FULLSCREEN, RESIZABLE});
+    auto ecs = ECS();
+    ecs.add_system(new WindowSystem);
 
-    add_component(game, Component_B{3,4});
+    auto game = ecs.new_entity();
 
-    printf("%d\n", get_component<Component_B>(game).d);
+    WindowComponent window = { "ECStest",
+            screen_width, screen_height,
+            FULLSCREEN, RESIZABLE, nullptr };
+
+    ecs.add_component(game, window);
+
+    printf("%d\n", component_vector<WindowComponent>[game].width);
+
+    ecs.init();
+    ecs.run(1);
+
 
     return 0;
 }

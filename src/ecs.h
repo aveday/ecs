@@ -1,22 +1,37 @@
 #pragma once
 #include <stdint.h>
+#include <stdlib.h>
 #include <vector>
-#include <typeinfo>
-#include <typeindex>
-#include <unordered_map>
-#include "ecs.h"
+#include <list>
+#include "System.h"
 
 #define MAX_ENTS 10000
-#define GTI(type) std::type_index(typeid(type))
 
-std::unordered_map<std::type_index, void*> component_vectors; 
-std::unordered_map<std::type_index, uint16_t> component_masks;
-std::vector<uint64_t> entity_masks(MAX_ENTS);
+template <typename T> std::vector<T> component_vector;
+template <typename T> uint64_t component_mask;
 
-int entity_count = 0;
+struct ECS {
+    int entity_count;
+    int component_types;
+    bool running = true;
 
+    std::vector<uint64_t> entity_mask = std::vector<uint64_t>(MAX_ENTS);
+
+    std::list<System*> systems;
+
+    void init();
+    void run(int dt);
+
+    int new_entity();
+    void add_system(System *system);
+    template <typename T> T& get_component(int entity);
+    template <typename T> void add_component(int entity, T component);
+    template <typename T> void remove_component(int entity);
+};
+
+#ifdef ECS_IMPLEMENTATION
 /* Create a new entity, and return its ID */
-int new_entity()
+int ECS::new_entity()
 {
     if(entity_count < MAX_ENTS)
         return entity_count++;
@@ -26,32 +41,52 @@ int new_entity()
 
 /* Get a reference to a component on an entity */
 template <typename T>
-T& get_component(int entity)
+T& ECS::get_component(int entity)
 {
-    return (*(std::vector<T>*)component_vectors[GTI(T)])[entity];
+    return component_vector<T>[entity];
 }
 
 /* Add a new component to an entity */
 template <typename T>
-void add_component(int entity, T component)
+void ECS::add_component(int entity, T component)
 {
-    auto type = GTI(T);
-
     // if first component type instance -> create maps
-    if( !component_masks.count(type) ) {
-        component_masks[type] = 1 << (component_masks.size() - 1);
-        component_vectors[type] = new std::vector<T>(MAX_ENTS);
+    if(!component_mask<T>) {
+        component_mask<T> = 1 << component_types++;
+        component_vector<T> = std::vector<T>(MAX_ENTS);
     }
     // add component to vector and mark entity bitmask
-    (*(std::vector<T>*)component_vectors[type])[entity] = component;
-    entity_masks[entity] |= component_masks[type];
+    component_vector<T>[entity] = component;
+    entity_mask[entity] |= component_mask<T>;
 }
 
 /* Remove a component from an entity */
 template <typename T>
-void remove_component(int entity)
+void ECS::remove_component(int entity)
 {
-    auto type = GTI(T);
-    if( component_masks.count(type) )
-        entity_masks[entity] &= ~component_masks[type];
+    if(component_mask<T>)
+        entity_mask[entity] &= ~component_mask<T>;
 }
+
+void ECS::add_system(System *system)
+{
+    systems.push_back(system);
+}
+
+void ECS::init()
+{
+    for(System *system : systems) {
+        system->init(*this);
+    }
+}
+
+void ECS::run(int dt)
+{
+    while (running) {
+        for (auto *system : systems) {
+            system->run(*this, dt);
+        }
+    }
+}
+
+#endif //ECS_IMPLEMENTATION
