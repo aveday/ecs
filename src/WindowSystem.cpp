@@ -3,7 +3,6 @@
 
 void WindowSystem::init(ECS& ecs)
 {
-    mask = component_mask<WindowComponent>;
     // initialize GLFW and set window options
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);

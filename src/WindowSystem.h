@@ -12,6 +12,7 @@ class WindowSystem : public System
 public:
     void init(ECS &ecs);
     void run(ECS &ecs, int dt);
+    uint64_t mask = component_mask<WindowComponent>;
 
 private:
     void clear();
