@@ -2,7 +2,7 @@
 #include <thread>
 #include "WindowSystem.h"
 
-void WindowSystem::init(ECS& ecs)
+WindowSystem::WindowSystem()
 {
     // initialize GLFW and set window options
     glfwInit();

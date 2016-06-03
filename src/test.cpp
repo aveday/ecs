@@ -12,7 +12,8 @@
 int main()
 {
     // Create Entity-Component System and game entity
-    ECS ecs({ new WindowSystem });
+    ECS ecs;
+    ecs.add_system<WindowSystem>();
 
     auto game = ecs.new_entity(
             Window{"ECStest"},

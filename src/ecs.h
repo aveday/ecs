@@ -12,8 +12,9 @@ const uint64_t RESERVED = 0x01;
 template <typename T> std::vector<T> component_vector;
 template <typename T> uint64_t component_mask = RESERVED;
 
+struct ECS;
+
 struct System {
-    virtual void init(struct ECS&) = 0;
     virtual void process(int e) = 0;
     virtual uint64_t get_mask() = 0;
 };
@@ -25,8 +26,8 @@ struct ECS {
     std::list<System*> systems;
 
     /* Main API - only use in main program */
-    ECS(std::list<System*> systems);
-    void add_system(System* system);
+    template <typename T, typename... Args>
+    void add_system(Args... args);
     void run(bool &alive);
 
     /* System-facing API - must all be inline */
@@ -81,10 +82,10 @@ void ECS::add_component(int entity, T component)
 }
 
 /* Add multiple new components to an entity */
-template <typename T, typename... Args>
-void ECS::add_component(int entity, T component, Args... args) {
+template <typename T, typename... Ts>
+void ECS::add_component(int entity, T component, Ts... components) {
         add_component(entity, component);
-        add_component(entity, args...);
+        add_component(entity, components...);
 }
 
 /* Remove a component from an entity */
@@ -97,18 +98,11 @@ void ECS::remove_component(int entity)
 
 #ifdef ECS_IMPLEMENTATION // MAIN API:
 
-/* Construct ECS with a list of systems */
-ECS::ECS(std::list<System*> systems)
+/* Add a new System */
+template <typename T, typename... Args>
+void ECS::add_system(Args... args)
 {
-    for(auto system : systems)
-        add_system(system);
-}
-
-/* Add and initialise a new System */
-void ECS::add_system(System *system)
-{
-    systems.push_back(system);
-    system->init(*this);
+    systems.push_back(new T(args...));
 }
 
 /* Run all systems in a loop */
