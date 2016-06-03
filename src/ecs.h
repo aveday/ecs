@@ -7,11 +7,11 @@
 
 #define MAX_ENTS 10000
 
-const uint64_t NULL_MASK = 0x01;
+const uint64_t RESERVED = 0x01;
 const int ECS_ID = 0;
 
 template <typename T> std::vector<T> component_vector;
-template <typename T> uint64_t component_mask = NULL_MASK;
+template <typename T> uint64_t component_mask = RESERVED;
 
 struct System {
     virtual void init(struct ECS&) = 0;
@@ -47,7 +47,7 @@ int ECS::new_entity()
     int e = 0;
     while(entity_mask[e]) e++;
     if(e < MAX_ENTS) {
-        entity_mask[e] = NULL_MASK;
+        entity_mask[e] = RESERVED;
         last_id = e > last_id ? e : last_id;
         return e;
     } else {
@@ -60,14 +60,14 @@ template <typename T>
 void ECS::add_component(int entity, T component)
 {
     // create mask and vector on first instance of component type
-    if(component_mask<T> == NULL_MASK) {
+    if(component_mask<T> == RESERVED) {
         component_mask<T> = 1 << component_types++;
         component_vector<T> = std::vector<T>(MAX_ENTS);
     }
-    // add component to vector, mark entity bitmask, unset null-mask bit
+    // add component to vector, mark entity bitmask, unset reserve bit
     component_vector<T>[entity] = T(component);
     entity_mask[entity] |= component_mask<T>;
-    entity_mask[entity] &= ~NULL_MASK;
+    entity_mask[entity] &= ~RESERVED;
 }
 
 /* Remove a component from an entity */
@@ -78,10 +78,10 @@ void ECS::remove_component(int entity)
         entity_mask[entity] &= ~component_mask<T>;
 }
 
-// check entity has all mask components and null-mask bit isn't set
+// check entity has all mask components and reserve bit isn't set
 bool ECS::check_mask(int entity, uint64_t mask)
 {
-    return !(mask & (~entity_mask[entity] | NULL_MASK));
+    return !(mask & (~entity_mask[entity] | RESERVED));
 }
 
 #ifdef ECS_IMPLEMENTATION // MAIN API:
@@ -89,7 +89,7 @@ bool ECS::check_mask(int entity, uint64_t mask)
 /* Construct ECS with a list of systems */
 ECS::ECS(std::list<System*> systems)
 {
-    entity_mask[ECS_ID] = NULL_MASK;
+    entity_mask[ECS_ID] = RESERVED;
     for(auto system : systems)
         add_system(system);
 }
@@ -104,11 +104,8 @@ void ECS::add_system(System *system)
 /* Run all systems in a loop */
 void ECS::run()
 {
-    while (running) {
-        for (auto *system : systems) {
-            system->step(*this);
-        }
-    }
+    while (running) for (auto *system : systems)
+        system->step(*this);
 }
 
 #endif //ECS_IMPLEMENTATION
