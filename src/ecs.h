@@ -20,7 +20,7 @@ struct System {
 
 struct ECS {
     int component_types = 1;
-    int last_id = ECS_ID;
+    int end_id = ECS_ID + 1;
     bool running = true;
     std::vector<uint64_t> entity_mask = std::vector<uint64_t>(MAX_ENTS);
     std::list<System*> systems;
@@ -64,7 +64,7 @@ int ECS::new_entity()
         exit(EXIT_FAILURE);
 
     entity_mask[e] = RESERVED;
-    last_id = e > last_id ? e : last_id;
+    end_id = (e >= end_id) ? (e + 1) : end_id;
     return e;
 }
 
