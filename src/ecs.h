@@ -33,13 +33,10 @@ struct ECS {
     inline bool check_mask(int entity, uint64_t mask);
     inline int new_entity();
 
-    template <typename T>
-    inline void add_component(int entity, T component);
-    template <typename T, typename... Args>
-    inline void add_component(int entity, T component, Args... args);
-
-    template <typename T>
-    inline void remove_component(int entity);
+    template <typename T> inline void remove_component(int entity);
+    template <typename T> inline void add_component(int entity, T component);
+    template <typename T, typename... Ts>
+    inline void add_component(int entity, T component, Ts... components);
 };
 
 /* Create a new entity, and return its ID */
