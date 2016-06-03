@@ -48,8 +48,8 @@ void WindowSystem::makeWindow(Window &window)
 void WindowSystem::process(int e)
 {
     //std::cout << mask() << std::endl;
-    Window &window = ECS::get<Window>(e);
-    Clock &clock = ECS::get<Clock>(e);
+    Window &window = ECS::comp<Window>(e);
+    Clock &clock = ECS::comp<Clock>(e);
 
     // Manage time
     float excess_seconds = clock.time - glfwGetTime() + clock.min;

@@ -6,8 +6,7 @@
 #include "ecs.h"
 #include "Component.h"
 
-class WindowSystem : public System
-{
+class WindowSystem : public System {
 public:
     WindowSystem();
     void process(int e);

@@ -14,16 +14,19 @@ struct System {
 
 class ECS {
 private:
-    template <typename C> static std::vector<C> component_vector;
-    template <typename C> static bitmask component_mask;
+    template <typename C>
+    static std::vector<C> component_vector;
+
+    template <typename C>
+    static bitmask component_mask;
 
     static const int max_ents;
     static int component_types;
     static int end_id;
     static std::list<System*> systems;
+    static std::vector<bitmask> entity_mask;
 
 public:
-    static std::vector<bitmask> entity_mask;
     /* Main API - only use in main program */
     template <typename S, typename... Args>
     static void add_system(Args... args);
@@ -45,7 +48,7 @@ public:
     static inline void add_component(int entity, C c, Cs... cs);
 
     template <typename C>
-    static inline C& get(int e) {
+    static inline C& comp(int e) {
         return component_vector<C>[e];
     }
 
@@ -122,6 +125,7 @@ void ECS::remove_component(int entity)
 template <typename C> std::vector<C> ECS::component_vector;
 template <typename C> bitmask ECS::component_mask = RESERVED;
 
+// static field definitions
 const int ECS::max_ents = ECS_MAX_ENTS;
 int ECS::component_types = 0;
 int ECS::end_id = 0;

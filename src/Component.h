@@ -12,8 +12,7 @@ struct Window {
     GLFWwindow* gl_window = nullptr;
 };
 
-struct Clock
-{
+struct Clock {
     float min;
     float start_time = (float)glfwGetTime();
     float time = 0;

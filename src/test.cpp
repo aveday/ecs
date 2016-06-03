@@ -20,10 +20,10 @@ int main()
             Clock{1.0/FPS_CAP});
 
     // Print debug info
-    std::cout << ECS::get<Window>(game).width << std::endl;
+    std::cout << ECS::comp<Window>(game).width << std::endl;
 
     // Run ECS while the window is open
-    ECS::run( ECS::get<Window>(game).open );
+    ECS::run( ECS::comp<Window>(game).open );
 
     return 0;
 }
