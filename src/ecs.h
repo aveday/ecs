@@ -19,7 +19,7 @@ struct System {
 };
 
 struct ECS {
-    int component_types = 1;
+    int component_types = 0;
     int end_id = ECS_ID + 1;
     bool running = true;
     std::vector<uint64_t> entity_mask = std::vector<uint64_t>(MAX_ENTS);
@@ -74,7 +74,7 @@ void ECS::add_component(int entity, T component)
 {
     // create mask and vector on first instance of component type
     if(component_mask<T> == RESERVED) {
-        component_mask<T> = 1 << component_types++;
+        component_mask<T> = 1 << ++component_types;
         component_vector<T> = std::vector<T>(MAX_ENTS);
     }
     // add component to vector, mark entity bitmask, unset reserve bit
