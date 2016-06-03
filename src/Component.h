@@ -10,3 +10,12 @@ struct Window {
     bool resizable = false;
     GLFWwindow* gl_window = nullptr;
 };
+
+struct Clock
+{
+    float min;
+    float start_time = (float)glfwGetTime();
+    float time;
+    float dt = 0;
+    bool running = false;
+};

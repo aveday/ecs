@@ -11,7 +11,7 @@ class WindowSystem : public System
 {
 public:
     void init(ECS &ecs);
-    void step(ECS &ecs, int dt);
+    void step(ECS &ecs);
 
 private:
     void clear();

@@ -9,25 +9,34 @@
 #define MAX_ENTS 10000
 
 const uint64_t NULL_MASK = 0x01;
+const int ECS_ID = 0;
 
 template <typename T> std::vector<T> component_vector;
 template <typename T> uint64_t component_mask = NULL_MASK;
 
 struct ECS {
     void run();
-    int entity_count = 0;
+    int entity_count = 1;
     int component_types = 1;
     bool running = true;
     std::vector<uint64_t> entity_mask = std::vector<uint64_t>(MAX_ENTS);
     std::list<System*> systems;
 
     ECS(std::list<System*> systems);
-    void add_system(System *system);
+    void add_system(System* system);
 
     inline bool check_mask(int entity, uint64_t mask);
     inline int new_entity();
     template <typename T> inline void add_component(int entity, T component);
     template <typename T> inline void remove_component(int entity);
+
+    /* Add a new component to global ECS context */
+    template <typename T> inline void add_global_component(T component)
+        { add_component(ECS_ID, component); }
+
+    /* Remove a component from the global ECS context */
+    template <typename T> inline void remove_global_component()
+        { remove_component<T>(ECS_ID); }
 };
 
 /* Create a new entity, and return its ID */
@@ -87,7 +96,7 @@ void ECS::run()
 {
     while (running) {
         for (auto *system : systems) {
-            system->step(*this, 1);
+            system->step(*this);
         }
     }
 }

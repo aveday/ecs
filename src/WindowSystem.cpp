@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <thread>
 #include "WindowSystem.h"
 
 void WindowSystem::init(ECS& ecs)
@@ -44,29 +45,40 @@ void WindowSystem::makeWindow(Window &window)
     glDepthFunc(GL_LEQUAL);
 }
 
-void WindowSystem::step(ECS &ecs, int dt)
+void WindowSystem::step(ECS &ecs)
 {
-    uint64_t mask = component_mask<Window>;
+    uint64_t mask = component_mask<Window>
+                  | component_mask<Clock>;
 
-    for(int e = 0; e < ecs.entity_count; e++) {
-        if( !ecs.check_mask(e, mask) ) continue;
+    if( !ecs.check_mask(ECS_ID, mask) ) return;
+    Window &window = component_vector<Window>[ECS_ID];
+    Clock &clock = component_vector<Clock>[ECS_ID];
 
-        Window &window = component_vector<Window>[e];
-        //TODO check resize
-        //TODO do entity checking in System::step while looping through subsystems
-        if (!window.gl_window)
-            makeWindow(window);
+    // Manage time
+    float excess_seconds = clock.time - glfwGetTime() + clock.min;
+    if(excess_seconds > 0) {
+        int ms = 1000 * excess_seconds;
+        std::this_thread::sleep_for( std::chrono::milliseconds(ms) );
+    }
 
-        glfwPollEvents();
-        clear();
-        glfwSwapBuffers(window.gl_window);
-    
-        if(glfwWindowShouldClose(window.gl_window))
-        {
-            glfwDestroyWindow(window.gl_window);
-            ecs.running = false;
-            glfwTerminate();
-        }
+    float newTime = glfwGetTime();
+    clock.dt = newTime - clock.time;
+    clock.time = newTime;
+
+    //TODO check resize
+    //TODO do entity checking in System::step while looping through subsystems
+    if (!window.gl_window)
+        makeWindow(window);
+
+    glfwPollEvents();
+    clear();
+    glfwSwapBuffers(window.gl_window);
+
+    if(glfwWindowShouldClose(window.gl_window))
+    {
+        glfwDestroyWindow(window.gl_window);
+        ecs.running = false;
+        glfwTerminate();
     }
 }
 
