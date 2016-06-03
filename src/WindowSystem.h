@@ -15,8 +15,8 @@ public:
 
 private:
     void clear();
-    void makeWindow(WindowComponent &window);
-    bool hasResized(WindowComponent &window);
+    void makeWindow(Window &window);
+    bool hasResized(Window &window);
     static void keyPress(
             GLFWwindow* gl_window,
             int key, int scancode, int action, int mods);

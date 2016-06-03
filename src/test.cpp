@@ -16,10 +16,10 @@ int main()
     auto player = ecs.new_entity();
 
     // Create a new game window
-    ecs.add_component(game, WindowComponent{ "ECStest"} );
+    ecs.add_component(game, Window{ "ECStest"} );
             
     // Print debug info
-    printf("%d\n", component_vector<WindowComponent>[game].width);
+    printf("%d\n", component_vector<Window>[game].width);
 
     // Run ECS
     ecs.run();

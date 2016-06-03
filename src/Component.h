@@ -2,7 +2,7 @@
 
 #include <GLFW/glfw3.h>
 
-struct WindowComponent {
+struct Window {
     const char* title;
     int width = 640;
     int height = 480;

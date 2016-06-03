@@ -1,4 +1,3 @@
-#include <iostream>
 #include <stdio.h>
 #include "WindowSystem.h"
 
@@ -23,7 +22,7 @@ void WindowSystem::keyPress(
     else if(action == GLFW_RELEASE) { switch(key) { } }
 }
 
-void WindowSystem::makeWindow(WindowComponent &window)
+void WindowSystem::makeWindow(Window &window)
 {
     glfwWindowHint(GLFW_RESIZABLE, window.resizable);
 
@@ -47,12 +46,12 @@ void WindowSystem::makeWindow(WindowComponent &window)
 
 void WindowSystem::step(ECS &ecs, int dt)
 {
-    uint64_t mask = component_mask<WindowComponent>;
+    uint64_t mask = component_mask<Window>;
 
     for(int e = 0; e < ecs.entity_count; e++) {
         if( !ecs.check_mask(e, mask) ) continue;
 
-        WindowComponent &window = component_vector<WindowComponent>[e];
+        Window &window = component_vector<Window>[e];
         //TODO check resize
         //TODO do entity checking in System::step while looping through subsystems
         if (!window.gl_window)
@@ -64,7 +63,6 @@ void WindowSystem::step(ECS &ecs, int dt)
     
         if(glfwWindowShouldClose(window.gl_window))
         {
-
             glfwDestroyWindow(window.gl_window);
             ecs.running = false;
             glfwTerminate();
@@ -72,7 +70,7 @@ void WindowSystem::step(ECS &ecs, int dt)
     }
 }
 
-bool WindowSystem::hasResized(WindowComponent &window)
+bool WindowSystem::hasResized(Window &window)
 {
     // get size of OpenGL window
     int new_width, new_height;

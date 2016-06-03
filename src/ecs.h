@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <stdint.h>
 #include <stdlib.h>
 #include <vector>
@@ -75,7 +74,6 @@ ECS::ECS(std::list<System*> systems)
     for(auto system : systems)
         add_system(system);
 }
-
 
 /* Add and initialise a new System */
 void ECS::add_system(System *system)
