@@ -33,11 +33,25 @@ struct ECS {
     /* System-facing API - must all be inline */
     inline bool check_mask(int entity, uint64_t mask);
     inline int new_entity();
-    template <typename T> inline void add_component(int entity, T component);
-    template <typename T> inline void remove_component(int entity);
-    template <typename T> inline void add_global_component(T component)
+
+    template <typename T>
+    inline void add_component(int entity, T component);
+    template <typename T, typename... Args>
+    inline void add_component(int entity, T component, Args... args);
+
+    template <typename T>
+    inline void remove_component(int entity);
+
+    template <typename T>
+    inline void add_global_component(T component)
         { add_component(ECS_ID, component); }
-    template <typename T> inline void remove_global_component()
+
+    template <typename T, typename... Args>
+    inline void add_global_component(T component, Args... args)
+        { add_component(ECS_ID, component, args...); }
+
+    template <typename T>
+    inline void remove_global_component()
         { remove_component<T>(ECS_ID); }
 };
 
@@ -46,13 +60,12 @@ int ECS::new_entity()
 {
     int e = 0;
     while(entity_mask[e]) e++;
-    if(e < MAX_ENTS) {
-        entity_mask[e] = RESERVED;
-        last_id = e > last_id ? e : last_id;
-        return e;
-    } else {
+    if(e >= MAX_ENTS)
         exit(EXIT_FAILURE);
-    }
+
+    entity_mask[e] = RESERVED;
+    last_id = e > last_id ? e : last_id;
+    return e;
 }
 
 /* Add a new component to an entity */
@@ -68,6 +81,13 @@ void ECS::add_component(int entity, T component)
     component_vector<T>[entity] = T(component);
     entity_mask[entity] |= component_mask<T>;
     entity_mask[entity] &= ~RESERVED;
+}
+
+/* Add multiple new components to an entity */
+template <typename T, typename... Args>
+void ECS::add_component(int entity, T component, Args... args) {
+        add_component(entity, component);
+        add_component(entity, args...);
 }
 
 /* Remove a component from an entity */
