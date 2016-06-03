@@ -31,10 +31,18 @@ struct ECS {
 
     /* System-facing API - must all be inline */
     inline bool check_mask(int entity, uint64_t mask);
-    inline int new_entity();
 
-    template <typename T> inline void remove_component(int entity);
-    template <typename T> inline void add_component(int entity, T component);
+    inline int new_entity(); 
+
+    template <typename... Ts>
+    inline int new_entity(Ts... components);
+
+    template <typename T>
+    inline void remove_component(int entity);
+
+    template <typename T>
+    inline void add_component(int entity, T component);
+
     template <typename T, typename... Ts>
     inline void add_component(int entity, T component, Ts... components);
 };
@@ -49,6 +57,13 @@ int ECS::new_entity()
 
     entity_mask[e] = RESERVED;
     end_id = (e >= end_id) ? (e + 1) : end_id;
+    return e;
+}
+
+template <typename... Ts>
+int ECS::new_entity(Ts... components) {
+    int e = new_entity();
+    add_component(e, components...);
     return e;
 }
 

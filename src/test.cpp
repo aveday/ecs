@@ -15,13 +15,11 @@ int main()
     // Create Entity-Component System and game entity
     ECS ecs({ new WindowSystem });
 
-    auto game = ecs.new_entity();
-    auto player = ecs.new_entity();
-
-    // Create a new game window
-    ecs.add_component(game,
+    auto game = ecs.new_entity(
             Window{"ECStest"},
             Clock{1.0/FPS_CAP});
+
+    auto player = ecs.new_entity();
 
     // Print debug info
     printf("%d\n", component_vector<Window>[0].width);
