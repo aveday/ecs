@@ -7,21 +7,23 @@
 typedef uint64_t bitmask;
 const bitmask RESERVED = 0x01;
 
-template <typename C> std::vector<C> component_vector;
-template <typename C> bitmask component_mask = RESERVED;
-
 struct System {
     virtual void process(int e) = 0;
     virtual bitmask get_mask() = 0;
 };
 
-struct ECS {
+class ECS {
+private:
+    template <typename C> static std::vector<C> component_vector;
+    template <typename C> static bitmask component_mask;
+
     static const int max_ents;
     static int component_types;
     static int end_id;
     static std::vector<bitmask> entity_mask;
     static std::list<System*> systems;
 
+public:
     /* Main API - only use in main program */
     template <typename S, typename... Args>
     static void add_system(Args... args);
@@ -41,7 +43,18 @@ struct ECS {
 
     template <typename C, typename... Cs>
     static inline void add_component(int entity, C c, Cs... cs);
+
+    template <typename C>
+    static inline C& get(int e) {
+        return component_vector<C>[e];
+    }
+
+    template <typename C>
+    static inline bitmask mask() {
+        return component_mask<C>;
+    }
 };
+
 
 /* Create a new entity, and return its ID */
 int ECS::new_entity()
@@ -98,6 +111,10 @@ void ECS::remove_component(int entity)
 #ifndef ECS_MAX_ENTS
 #error Must define ECS_MAX_ENTS before ECS implementation
 #endif
+
+// component templates
+template <typename C> std::vector<C> ECS::component_vector;
+template <typename C> bitmask ECS::component_mask = RESERVED;
 
 const int ECS::max_ents = ECS_MAX_ENTS;
 int ECS::component_types = 0;

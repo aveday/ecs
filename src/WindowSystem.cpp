@@ -46,8 +46,8 @@ void WindowSystem::makeWindow(Window &window)
 
 void WindowSystem::process(int e)
 {
-    Window &window = component_vector<Window>[e];
-    Clock &clock = component_vector<Clock>[e];
+    Window &window = ECS::get<Window>(e);
+    Clock &clock = ECS::get<Clock>(e);
 
     // Manage time
     float excess_seconds = clock.time - glfwGetTime() + clock.min;

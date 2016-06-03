@@ -20,10 +20,10 @@ int main()
             Clock{1.0/FPS_CAP});
 
     // Print debug info
-    printf("%d\n", component_vector<Window>[0].width);
+    printf("%d\n", ECS::get<Window>(game).width);
 
     // Run ECS while the window is open
-    ECS::run( component_vector<Window>[game].open );
+    ECS::run( ECS::get<Window>(game).open );
 
     return 0;
 }
