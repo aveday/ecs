@@ -11,9 +11,8 @@ class WindowSystem : public System
 public:
     WindowSystem();
     void process(int e);
-    bitmask get_mask() {
-        return ECS::mask<Window>()
-             | ECS::mask<Clock>();
+    inline bitmask mask() {
+        return ECS::mask<Window, Clock>();
     }
 
 private:

@@ -9,7 +9,7 @@ const bitmask RESERVED = 0x01;
 
 struct System {
     virtual void process(int e) = 0;
-    virtual bitmask get_mask() = 0;
+    virtual bitmask mask() = 0;
 };
 
 class ECS {
@@ -20,10 +20,10 @@ private:
     static const int max_ents;
     static int component_types;
     static int end_id;
-    static std::vector<bitmask> entity_mask;
     static std::list<System*> systems;
 
 public:
+    static std::vector<bitmask> entity_mask;
     /* Main API - only use in main program */
     template <typename S, typename... Args>
     static void add_system(Args... args);
@@ -53,6 +53,12 @@ public:
     static inline bitmask mask() {
         return component_mask<C>;
     }
+
+    template <typename C1, typename C2, typename... Cs>
+    static inline bitmask mask() {
+        return component_mask<C1> | mask<C2, Cs...>();
+    }
+
 };
 
 
@@ -134,7 +140,7 @@ void ECS::run(bool &alive)
 {
     while (alive) for (auto *system : systems) {
         // calculate the system mask 
-        bitmask mask = system->get_mask();
+        bitmask mask = system->mask();
         
         // process each entity which fits the system mask
         for(int e = 0; e < end_id; e++)

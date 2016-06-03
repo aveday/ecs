@@ -1,3 +1,4 @@
+#include <iostream>
 #include <thread>
 #include "WindowSystem.h"
 
@@ -46,6 +47,7 @@ void WindowSystem::makeWindow(Window &window)
 
 void WindowSystem::process(int e)
 {
+    //std::cout << mask() << std::endl;
     Window &window = ECS::get<Window>(e);
     Clock &clock = ECS::get<Clock>(e);
 

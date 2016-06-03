@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <iostream>
 #include <GL/glew.h>
 
 #define ECS_IMPLEMENTATION
@@ -20,7 +20,7 @@ int main()
             Clock{1.0/FPS_CAP});
 
     // Print debug info
-    printf("%d\n", ECS::get<Window>(game).width);
+    std::cout << ECS::get<Window>(game).width << std::endl;
 
     // Run ECS while the window is open
     ECS::run( ECS::get<Window>(game).open );
