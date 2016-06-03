@@ -20,7 +20,7 @@ int main()
     // Create a new game window
     ecs.add_global_component( Window{"ECStest"} );
     ecs.add_global_component( Clock{1.0/FPS_CAP} );
-            
+
     // Print debug info
     printf("%d\n", component_vector<Window>[0].width);
 
