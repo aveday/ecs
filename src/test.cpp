@@ -2,6 +2,7 @@
 #include <GL/glew.h>
 
 #define ECS_IMPLEMENTATION
+#define ECS_MAX_ENTS 10000
 #include "ecs.h"
 
 #include "Component.h"
@@ -11,11 +12,10 @@
 
 int main()
 {
-    // Create Entity-Component System and game entity
-    ECS ecs;
-    ecs.add_system<WindowSystem>();
+    // Create window system
+    ECS::add_system<WindowSystem>();
 
-    auto game = ecs.new_entity(
+    auto game = ECS::new_entity(
             Window{"ECStest"},
             Clock{1.0/FPS_CAP});
 
@@ -23,7 +23,7 @@ int main()
     printf("%d\n", component_vector<Window>[0].width);
 
     // Run ECS while the window is open
-    ecs.run( component_vector<Window>[game].open );
+    ECS::run( component_vector<Window>[game].open );
 
     return 0;
 }

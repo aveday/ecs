@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <thread>
 #include "WindowSystem.h"
 
