@@ -4,7 +4,6 @@
 #include <GLFW/glfw3.h>
 
 #include "ecs.h"
-#include "System.h"
 #include "Component.h"
 
 class WindowSystem : public System

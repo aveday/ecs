@@ -6,7 +6,6 @@
 #include "ecs.h"
 
 #include "Component.h"
-#include "System.h"
 #include "WindowSystem.h"
 
 #define FPS_CAP 60

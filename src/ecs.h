@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <vector>
 #include <list>
-#include "System.h"
 #include "Component.h"
 
 #define MAX_ENTS 10000
@@ -13,6 +12,11 @@ const int ECS_ID = 0;
 
 template <typename T> std::vector<T> component_vector;
 template <typename T> uint64_t component_mask = NULL_MASK;
+
+struct System {
+    virtual void init(struct ECS&) = 0;
+    virtual void step(struct ECS&) = 0;
+};
 
 struct ECS {
     int component_types = 1;
