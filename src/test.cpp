@@ -7,6 +7,7 @@
 
 #include "Component.h"
 #include "WindowSystem.h"
+#include "RenderSystem.h"
 
 #define FPS_CAP 60
 
@@ -14,10 +15,13 @@ int main()
 {
     // Create window system
     ECS::add_system<WindowSystem>();
+    ECS::add_system<RenderSystem>();
 
     auto game = ECS::new_entity(
             Window{"ECStest"},
             Clock{1.0/FPS_CAP});
+
+    auto player = ECS::new_entity( Camera{} );
 
     // Print debug info
     std::cout << ECS::comp<Window>(game).width << std::endl;
