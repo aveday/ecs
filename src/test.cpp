@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 
 #define ECS_IMPLEMENTATION
 #include "ecs.h"
@@ -19,13 +18,11 @@ int main()
             Window{"ECStest"},
             Clock{1.0/FPS_CAP});
 
-    auto player = ecs.new_entity();
-
     // Print debug info
     printf("%d\n", component_vector<Window>[0].width);
 
-    // Run ECS
-    ecs.run();
+    // Run ECS while the window is open
+    ecs.run( component_vector<Window>[game].open );
 
     return 0;
 }

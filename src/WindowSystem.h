@@ -10,7 +10,11 @@ class WindowSystem : public System
 {
 public:
     void init(ECS &ecs);
-    void step(ECS &ecs);
+    void process(int e);
+    uint64_t get_mask() {
+        return component_mask<Window>
+             | component_mask<Clock>;
+    }
 
 private:
     void clear();

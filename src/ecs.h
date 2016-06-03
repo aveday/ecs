@@ -14,24 +14,22 @@ template <typename T> uint64_t component_mask = RESERVED;
 
 struct System {
     virtual void init(struct ECS&) = 0;
-    virtual void step(struct ECS&) = 0;
+    virtual void process(int e) = 0;
+    virtual uint64_t get_mask() = 0;
 };
 
 struct ECS {
     int component_types = 0;
     int end_id = 0;
-    bool running = true;
     std::vector<uint64_t> entity_mask = std::vector<uint64_t>(MAX_ENTS);
     std::list<System*> systems;
 
     /* Main API - only use in main program */
     ECS(std::list<System*> systems);
     void add_system(System* system);
-    void run();
+    void run(bool &alive);
 
     /* System-facing API - must all be inline */
-    inline bool check_mask(int entity, uint64_t mask);
-
     inline int new_entity(); 
 
     template <typename... Ts>
@@ -97,12 +95,6 @@ void ECS::remove_component(int entity)
         entity_mask[entity] &= ~component_mask<T>;
 }
 
-// check entity has all mask components and reserve bit isn't set
-bool ECS::check_mask(int entity, uint64_t mask)
-{
-    return !(mask & (~entity_mask[entity] | RESERVED));
-}
-
 #ifdef ECS_IMPLEMENTATION // MAIN API:
 
 /* Construct ECS with a list of systems */
@@ -120,10 +112,17 @@ void ECS::add_system(System *system)
 }
 
 /* Run all systems in a loop */
-void ECS::run()
+void ECS::run(bool &alive)
 {
-    while (running) for (auto *system : systems)
-        system->step(*this);
+    while (alive) for (auto *system : systems) {
+        // calculate the system mask 
+        uint64_t mask = system->get_mask();
+        
+        // process each entity which fits the system mask
+        for(int e = 0; e < end_id; e++)
+            if( !(mask & (~entity_mask[e] | RESERVED)) )
+                system->process(e);
+    }
 }
 
 #endif //ECS_IMPLEMENTATION

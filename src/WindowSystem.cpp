@@ -45,43 +45,35 @@ void WindowSystem::makeWindow(Window &window)
     glDepthFunc(GL_LEQUAL);
 }
 
-void WindowSystem::step(ECS &ecs)
+void WindowSystem::process(int e)
 {
-    uint64_t mask = component_mask<Window>
-                  | component_mask<Clock>;
+    Window &window = component_vector<Window>[e];
+    Clock &clock = component_vector<Clock>[e];
 
-    for(int e = 0; e < ecs.end_id; e++) {
-        if( !ecs.check_mask(e, mask) ) continue;
+    // Manage time
+    float excess_seconds = clock.time - glfwGetTime() + clock.min;
+    if(excess_seconds > 0) {
+        int ms = 1000 * excess_seconds;
+        std::this_thread::sleep_for( std::chrono::milliseconds(ms) );
+    }
 
-        Window &window = component_vector<Window>[e];
-        Clock &clock = component_vector<Clock>[e];
+    float newTime = glfwGetTime();
+    clock.dt = newTime - clock.time;
+    clock.time = newTime;
 
-        // Manage time
-        float excess_seconds = clock.time - glfwGetTime() + clock.min;
-        if(excess_seconds > 0) {
-            int ms = 1000 * excess_seconds;
-            std::this_thread::sleep_for( std::chrono::milliseconds(ms) );
-        }
+    //TODO check resize
+    if (!window.gl_window)
+        makeWindow(window);
 
-        float newTime = glfwGetTime();
-        clock.dt = newTime - clock.time;
-        clock.time = newTime;
+    glfwPollEvents();
+    clear();
+    glfwSwapBuffers(window.gl_window);
 
-        //TODO check resize
-        //TODO do entity checking in System::step while looping through subsystems
-        if (!window.gl_window)
-            makeWindow(window);
-
-        glfwPollEvents();
-        clear();
-        glfwSwapBuffers(window.gl_window);
-
-        if(glfwWindowShouldClose(window.gl_window))
-        {
-            glfwDestroyWindow(window.gl_window);
-            ecs.running = false;
-            glfwTerminate();
-        }
+    if(glfwWindowShouldClose(window.gl_window))
+    {
+        glfwDestroyWindow(window.gl_window);
+        glfwTerminate();
+        window.open = false;
     }
 }
 

@@ -8,6 +8,7 @@ struct Window {
     int height = 480;
     bool fullscreen = false;
     bool resizable = false;
+    bool open = true;
     GLFWwindow* gl_window = nullptr;
 };
 
@@ -17,5 +18,4 @@ struct Clock
     float start_time = (float)glfwGetTime();
     float time = 0;
     float dt = 0;
-    bool running = false;
 };
