@@ -9,25 +9,17 @@ const bitmask RESERVED = 0x01;
 
 class ECS {
 private:
-    template <typename C>
-    static std::vector<C> component_vector;
-
-    template <typename C>
-    static bitmask component_mask;
+    template <typename C> static std::vector<C> component_vector; 
+    template <typename C> static bitmask component_mask;
 
     static const int max_ents;
+    static int end_id;
     static int component_types;
     static std::vector<bitmask> entity_mask;
 
 public:
-    static int end_id; //FIXME privatise
-
-    /* Main API - only use in main program */
-    template <typename S, typename... Args>
-    static void run(bool &alive);
-
-    /* System-facing API - must all be inline */
     static inline int new_entity(); 
+    static inline int end() { return end_id; }
 
     template <typename... Cs>
     static inline int new_entity(Cs... c);
@@ -55,7 +47,6 @@ public:
     static inline bool has_components(int e) {
         return has_components<C1>(e) && has_components<C2, Cs...>(e);
     }
-
 };
 
 
@@ -107,6 +98,7 @@ void ECS::remove_component(int entity)
 {
     if(component_mask<C>)
         entity_mask[entity] &= ~component_mask<C>;
+    // TODO reset reserve bit on removal of last component?
 }
 
 #ifdef ECS_IMPLEMENTATION // MAIN API:

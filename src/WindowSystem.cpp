@@ -48,7 +48,7 @@ void WindowSystem::makeWindow(Window &window)
 void WindowSystem::run()
 {
     // process each entity which fits the system mask
-    for(int e = 0; e < ECS::end_id; e++) {
+    for(int e = 0; e < ECS::end(); e++) {
         if( !ECS::has_components<Window, Clock>(e) )
             continue;
 
