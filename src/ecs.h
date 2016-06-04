@@ -8,8 +8,7 @@ typedef uint64_t bitmask;
 const bitmask RESERVED = 0x01;
 
 struct System {
-    virtual void process(int e) = 0;
-    virtual bitmask mask() = 0;
+    virtual void process() = 0;
 };
 
 class ECS {
@@ -22,11 +21,12 @@ private:
 
     static const int max_ents;
     static int component_types;
-    static int end_id;
     static std::list<System*> systems;
     static std::vector<bitmask> entity_mask;
 
 public:
+    static int end_id; //FIXME privatise
+
     /* Main API - only use in main program */
     template <typename S, typename... Args>
     static void add_system(Args... args);
@@ -53,13 +53,13 @@ public:
     }
 
     template <typename C>
-    static inline bitmask mask() {
-        return component_mask<C>;
+    static inline bool has_component(int e) {
+        return !(component_mask<C> & (~entity_mask[e] | RESERVED));
     }
 
     template <typename C1, typename C2, typename... Cs>
-    static inline bitmask mask() {
-        return component_mask<C1> | mask<C2, Cs...>();
+    static inline bool has_component(int e) {
+        return has_component<C1>(e) && has_component<C2, Cs...>(e);
     }
 
 };
@@ -142,15 +142,9 @@ void ECS::add_system(Args... args)
 /* Run all systems in a loop */
 void ECS::run(bool &alive)
 {
-    while (alive) for (auto *system : systems) {
-        // calculate the system mask 
-        bitmask mask = system->mask();
-        
-        // process each entity which fits the system mask
-        for(int e = 0; e < end_id; e++)
-            if( !(mask & (~entity_mask[e] | RESERVED)) )
-                system->process(e);
-    }
+    while (alive)
+        for (auto *system : systems)
+            system->process();
 }
 
 #endif //ECS_IMPLEMENTATION

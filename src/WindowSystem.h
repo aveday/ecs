@@ -9,10 +9,7 @@
 class WindowSystem : public System {
 public:
     WindowSystem();
-    void process(int e);
-    inline bitmask mask() {
-        return ECS::mask<Window, Clock>();
-    }
+    void process();
 
 private:
     void clear();

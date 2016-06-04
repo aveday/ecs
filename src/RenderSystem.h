@@ -5,10 +5,6 @@
 
 class RenderSystem : public System {
 public: 
-    void process(int e);
-    inline bitmask mask() {
-        return ECS::mask<Window>();
-    }
-
+    void process();
 };
 

@@ -45,36 +45,41 @@ void WindowSystem::makeWindow(Window &window)
     glDepthFunc(GL_LEQUAL);
 }
 
-void WindowSystem::process(int e)
+void WindowSystem::process()
 {
-    //std::cout << mask() << std::endl;
-    Window &window = ECS::comp<Window>(e);
-    Clock &clock = ECS::comp<Clock>(e);
+    // process each entity which fits the system mask
+    for(int e = 0; e < ECS::end_id; e++) {
+        if( !ECS::has_component<Window, Clock>(e) )
+            continue;
 
-    // Manage time
-    float excess_seconds = clock.time - glfwGetTime() + clock.min;
-    if(excess_seconds > 0) {
-        int ms = 1000 * excess_seconds;
-        std::this_thread::sleep_for( std::chrono::milliseconds(ms) );
-    }
+        Window &window = ECS::comp<Window>(e);
+        Clock &clock = ECS::comp<Clock>(e);
 
-    float newTime = glfwGetTime();
-    clock.dt = newTime - clock.time;
-    clock.time = newTime;
+        // Manage time
+        float excess_seconds = clock.time - glfwGetTime() + clock.min;
+        if(excess_seconds > 0) {
+            int ms = 1000 * excess_seconds;
+            std::this_thread::sleep_for( std::chrono::milliseconds(ms) );
+        }
 
-    //TODO check resize
-    if (!window.gl_window)
-        makeWindow(window);
+        float newTime = glfwGetTime();
+        clock.dt = newTime - clock.time;
+        clock.time = newTime;
 
-    glfwPollEvents();
-    clear();
-    glfwSwapBuffers(window.gl_window);
+        //TODO check resize
+        if (!window.gl_window)
+            makeWindow(window);
 
-    if(glfwWindowShouldClose(window.gl_window))
-    {
-        glfwDestroyWindow(window.gl_window);
-        glfwTerminate();
-        window.open = false;
+        glfwPollEvents();
+        clear();
+        glfwSwapBuffers(window.gl_window);
+
+        if(glfwWindowShouldClose(window.gl_window))
+        {
+            glfwDestroyWindow(window.gl_window);
+            glfwTerminate();
+            window.open = false;
+        }
     }
 }
 

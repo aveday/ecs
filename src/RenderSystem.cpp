@@ -1,6 +1,6 @@
 #include "RenderSystem.h"
 
-void RenderSystem::process(int e)
+void RenderSystem::process()
 {
     /*
     // update the projection matrix
