@@ -71,6 +71,7 @@ int ECS::new_entity()
     return e;
 }
 
+/* Create new entity with components */
 template <typename... Cs>
 int ECS::new_entity(Cs... components) {
     int e = new_entity();
@@ -96,15 +97,14 @@ void ECS::add_component(int entity, C component)
 /* Add multiple new components to an entity */
 template <typename C, typename... Cs>
 void ECS::add_component(int entity, C component, Cs... components) {
-        add_component(entity, component);
-        add_component(entity, components...);
+    add_component(entity, component);
+    add_component(entity, components...);
 }
 
 /* Remove a component from an entity */
 template <typename C>
 void ECS::remove_component(int entity)
 {
-    if(component_mask<C>)
-        entity_mask[entity] &= ~component_mask<C>;
+    entity_mask[entity] &= ~component_mask<C>;
     // TODO reset reserve bit on removal of last component?
 }
