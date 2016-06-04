@@ -20,8 +20,7 @@ struct Clock {
     float dt = 0;
 };
 
-struct Camera
-{
+struct Camera {
     float fov = 45;
     float aspect = 16/9.0f; //FIXME
     float near = 0.1f;
