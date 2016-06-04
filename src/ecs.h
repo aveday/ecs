@@ -49,6 +49,14 @@ public:
     }
 };
 
+#ifdef ECS_MAX_ENTS
+template <typename C> std::vector<C> ECS::component_vector;
+template <typename C> bitmask ECS::component_mask = RESERVED;
+const int ECS::max_ents = ECS_MAX_ENTS;
+int ECS::component_types = 0;
+int ECS::end_id = 0;
+std::vector<bitmask> ECS::entity_mask = std::vector<bitmask>(ECS_MAX_ENTS);
+#endif
 
 /* Create a new entity, and return its ID */
 int ECS::new_entity()
@@ -100,21 +108,3 @@ void ECS::remove_component(int entity)
         entity_mask[entity] &= ~component_mask<C>;
     // TODO reset reserve bit on removal of last component?
 }
-
-#ifdef ECS_IMPLEMENTATION // MAIN API:
-
-#ifndef ECS_MAX_ENTS
-#error Must define ECS_MAX_ENTS before ECS implementation
-#endif
-
-// component templates
-template <typename C> std::vector<C> ECS::component_vector;
-template <typename C> bitmask ECS::component_mask = RESERVED;
-
-// static field definitions
-const int ECS::max_ents = ECS_MAX_ENTS;
-int ECS::component_types = 0;
-int ECS::end_id = 0;
-std::vector<bitmask> ECS::entity_mask = std::vector<bitmask>(ECS_MAX_ENTS);
-
-#endif //ECS_IMPLEMENTATION

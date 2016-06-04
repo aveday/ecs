@@ -1,7 +1,6 @@
 #include <iostream>
 #include <GL/glew.h>
 
-#define ECS_IMPLEMENTATION
 #define ECS_MAX_ENTS 10000
 #include "ecs.h"
 
