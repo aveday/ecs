@@ -48,12 +48,12 @@ void WindowSystem::makeWindow(Window &window)
 void WindowSystem::run()
 {
     // process each entity which fits the system mask
-    for(int e = 0; e < ECS::end(); e++) {
-        if( !ECS::has_components<Window, Clock>(e) )
+    for(int e = 0; e < EM::end(); e++) {
+        if( !EM::has_components<Window, Clock>(e) )
             continue;
 
-        Window &window = ECS::get_component<Window>(e);
-        Clock &clock = ECS::get_component<Clock>(e);
+        Window &window = EM::get_component<Window>(e);
+        Clock &clock = EM::get_component<Clock>(e);
 
         // Manage time
         float excess_seconds = clock.time - glfwGetTime() + clock.min;
@@ -78,7 +78,7 @@ void WindowSystem::run()
         {
             glfwDestroyWindow(window.gl_window);
             glfwTerminate();
-            ECS::remove_component<Window>(e);
+            EM::remove_component<Window>(e);
         }
     }
 }

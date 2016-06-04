@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "ecs.h"
+#include "EntityManager.h"
 #include "Component.h"
 
 class WindowSystem {

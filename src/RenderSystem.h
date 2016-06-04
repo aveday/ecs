@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecs.h"
+#include "EntityManager.h"
 #include "Component.h"
 
 class RenderSystem {

@@ -1,8 +1,8 @@
 #include <iostream>
 #include <GL/glew.h>
 
-#define ECS_MAX_ENTS 10000
-#include "ecs.h"
+#define EM_MAX_ENTS 10000
+#include "EntityManager.h"
 
 #include "Component.h"
 #include "WindowSystem.h"
@@ -17,16 +17,16 @@ int main()
     RenderSystem rendering;
 
     // Create entities
-    auto player = ECS::new_entity( Camera{} );
-    auto game = ECS::new_entity(
-            Window{"ECStest"},
+    auto player = EM::new_entity( Camera{} );
+    auto game = EM::new_entity(
+            Window{"EMtest"},
             Clock{1.0/FPS_CAP});
 
     // Print debug info
-    std::cout << ECS::get_component<Window>(game).width << std::endl;
+    std::cout << EM::get_component<Window>(game).width << std::endl;
 
-    // Run ECS while the window is open
-    while( ECS::has_components<Window>(game) ) {
+    // Run EM while the window is open
+    while( EM::has_components<Window>(game) ) {
         windowing.run();
         rendering.run();
     }

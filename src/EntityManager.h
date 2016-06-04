@@ -7,7 +7,7 @@
 typedef uint64_t bitmask;
 const bitmask RESERVED = 0x01;
 
-class ECS {
+typedef class EntityManager {
 private:
     template <typename C> static std::vector<C> component_vector; 
     template <typename C> static bitmask component_mask;
@@ -47,19 +47,19 @@ public:
     static inline bool has_components(int e) {
         return has_components<C1>(e) && has_components<C2, Cs...>(e);
     }
-};
+} EM;
 
-#ifdef ECS_MAX_ENTS
-template <typename C> std::vector<C> ECS::component_vector;
-template <typename C> bitmask ECS::component_mask = RESERVED;
-const int ECS::max_ents = ECS_MAX_ENTS;
-int ECS::component_types = 0;
-int ECS::end_id = 0;
-std::vector<bitmask> ECS::entity_mask = std::vector<bitmask>(ECS_MAX_ENTS);
+#ifdef EM_MAX_ENTS
+template <typename C> std::vector<C> EntityManager::component_vector;
+template <typename C> bitmask EntityManager::component_mask = RESERVED;
+const int EntityManager::max_ents = EM_MAX_ENTS;
+int EntityManager::component_types = 0;
+int EntityManager::end_id = 0;
+std::vector<bitmask> EntityManager::entity_mask = std::vector<bitmask>(EM_MAX_ENTS);
 #endif
 
 /* Create a new entity, and return its ID */
-int ECS::new_entity()
+int EntityManager::new_entity()
 {
     int e = 0;
     while(entity_mask[e]) e++;
@@ -73,7 +73,7 @@ int ECS::new_entity()
 
 /* Create new entity with components */
 template <typename... Cs>
-int ECS::new_entity(Cs... components) {
+int EntityManager::new_entity(Cs... components) {
     int e = new_entity();
     add_component(e, components...);
     return e;
@@ -81,7 +81,7 @@ int ECS::new_entity(Cs... components) {
 
 /* Add a new component to an entity */
 template <typename C>
-void ECS::add_component(int entity, C component)
+void EntityManager::add_component(int entity, C component)
 {
     // create mask and vector on first instance of component type
     if(component_mask<C> == RESERVED) {
@@ -96,14 +96,14 @@ void ECS::add_component(int entity, C component)
 
 /* Add multiple new components to an entity */
 template <typename C, typename... Cs>
-void ECS::add_component(int entity, C component, Cs... components) {
+void EntityManager::add_component(int entity, C component, Cs... components) {
     add_component(entity, component);
     add_component(entity, components...);
 }
 
 /* Remove a component from an entity */
 template <typename C>
-void ECS::remove_component(int entity)
+void EntityManager::remove_component(int entity)
 {
     entity_mask[entity] &= ~component_mask<C>;
     // TODO reset reserve bit on removal of last component?
