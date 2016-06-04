@@ -34,6 +34,8 @@ public:
 
     template <typename C>
     static inline C& get_component(int e) {
+        if(!has_components<C>(e))
+            exit(EXIT_FAILURE);
         return component_vector<C>[e];
     }
 
