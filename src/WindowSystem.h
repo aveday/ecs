@@ -6,10 +6,10 @@
 #include "ecs.h"
 #include "Component.h"
 
-class WindowSystem : public System {
+class WindowSystem {
 public:
     WindowSystem();
-    void process();
+    void run();
 
 private:
     void clear();

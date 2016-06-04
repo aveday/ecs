@@ -9,7 +9,6 @@ struct Window {
     int height = 480;
     bool fullscreen = false;
     bool resizable = false;
-    bool open = true;
     GLFWwindow* gl_window = nullptr;
 };
 

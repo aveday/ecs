@@ -3,8 +3,8 @@
 #include "ecs.h"
 #include "Component.h"
 
-class RenderSystem : public System {
+class RenderSystem {
 public: 
-    void process();
+    void run();
 };
 

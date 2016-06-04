@@ -7,10 +7,6 @@
 typedef uint64_t bitmask;
 const bitmask RESERVED = 0x01;
 
-struct System {
-    virtual void process() = 0;
-};
-
 class ECS {
 private:
     template <typename C>
@@ -21,7 +17,6 @@ private:
 
     static const int max_ents;
     static int component_types;
-    static std::list<System*> systems;
     static std::vector<bitmask> entity_mask;
 
 public:
@@ -29,7 +24,6 @@ public:
 
     /* Main API - only use in main program */
     template <typename S, typename... Args>
-    static void add_system(Args... args);
     static void run(bool &alive);
 
     /* System-facing API - must all be inline */
@@ -48,18 +42,18 @@ public:
     static inline void add_component(int entity, C c, Cs... cs);
 
     template <typename C>
-    static inline C& comp(int e) {
+    static inline C& get_component(int e) {
         return component_vector<C>[e];
     }
 
     template <typename C>
-    static inline bool has_component(int e) {
+    static inline bool has_components(int e) {
         return !(component_mask<C> & (~entity_mask[e] | RESERVED));
     }
 
     template <typename C1, typename C2, typename... Cs>
-    static inline bool has_component(int e) {
-        return has_component<C1>(e) && has_component<C2, Cs...>(e);
+    static inline bool has_components(int e) {
+        return has_components<C1>(e) && has_components<C2, Cs...>(e);
     }
 
 };
@@ -130,21 +124,5 @@ const int ECS::max_ents = ECS_MAX_ENTS;
 int ECS::component_types = 0;
 int ECS::end_id = 0;
 std::vector<bitmask> ECS::entity_mask = std::vector<bitmask>(ECS_MAX_ENTS);
-std::list<System*> ECS::systems;
-
-/* Add a new System */
-template <typename S, typename... Args>
-void ECS::add_system(Args... args)
-{
-    systems.push_back(new S(args...));
-}
-
-/* Run all systems in a loop */
-void ECS::run(bool &alive)
-{
-    while (alive)
-        for (auto *system : systems)
-            system->process();
-}
 
 #endif //ECS_IMPLEMENTATION

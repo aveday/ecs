@@ -45,15 +45,15 @@ void WindowSystem::makeWindow(Window &window)
     glDepthFunc(GL_LEQUAL);
 }
 
-void WindowSystem::process()
+void WindowSystem::run()
 {
     // process each entity which fits the system mask
     for(int e = 0; e < ECS::end_id; e++) {
-        if( !ECS::has_component<Window, Clock>(e) )
+        if( !ECS::has_components<Window, Clock>(e) )
             continue;
 
-        Window &window = ECS::comp<Window>(e);
-        Clock &clock = ECS::comp<Clock>(e);
+        Window &window = ECS::get_component<Window>(e);
+        Clock &clock = ECS::get_component<Clock>(e);
 
         // Manage time
         float excess_seconds = clock.time - glfwGetTime() + clock.min;
@@ -78,7 +78,7 @@ void WindowSystem::process()
         {
             glfwDestroyWindow(window.gl_window);
             glfwTerminate();
-            window.open = false;
+            ECS::remove_component<Window>(e);
         }
     }
 }
