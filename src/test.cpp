@@ -17,7 +17,11 @@ int main()
     RenderSystem rendering;
 
     // Create entities
-    auto player = EM::new_entity( Camera{} );
+    auto player = EM::new_entity(
+            Camera{},
+            Model{},
+            Shader{"glsl/specular.vs", "glsl/specular.fs"});
+
     auto game = EM::new_entity(
             Window{"EMtest"},
             Clock{1.0/FPS_CAP});
@@ -25,7 +29,7 @@ int main()
     // Print debug info
     std::cout << EM::get_component<Window>(game).width << std::endl;
 
-    // Run EM while the window is open
+    // Run systems while the game window exists
     while( EM::has_components<Window>(game) ) {
         windowing.run();
         rendering.run();

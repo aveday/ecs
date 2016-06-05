@@ -12,8 +12,7 @@ WindowSystem::WindowSystem()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 }
 
-void WindowSystem::keyPress(
-        GLFWwindow* gl_window,
+void WindowSystem::KeyPress(GLFWwindow* gl_window,
         int key, int scancode, int action, int mods)
 {
     if(key == GLFW_KEY_ESCAPE)
@@ -23,7 +22,7 @@ void WindowSystem::keyPress(
     else if(action == GLFW_RELEASE) { switch(key) { } }
 }
 
-void WindowSystem::makeWindow(Window &window)
+void WindowSystem::MakeWindow(Window &window)
 {
     glfwWindowHint(GLFW_RESIZABLE, window.resizable);
 
@@ -33,12 +32,14 @@ void WindowSystem::makeWindow(Window &window)
             window.fullscreen ? glfwGetPrimaryMonitor() : NULL, NULL);
 
     glfwMakeContextCurrent(window.gl_window);
-    glfwSetKeyCallback(window.gl_window, keyPress);
+    glfwSetKeyCallback(window.gl_window, KeyPress);
     glfwSetInputMode(window.gl_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
     // setup GLEW (must be done after creating GL context)
     glewExperimental = GL_TRUE;
-    glewInit();
+    GLenum err = glewInit();
+    if (err != GLEW_OK)
+	    fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 
     // enable depth tests
     glEnable(GL_DEPTH_TEST);
@@ -49,15 +50,15 @@ void WindowSystem::run()
 {
     // process each entity which fits the system mask
     for(int e = 0; e < EM::end(); e++) {
-        if( !EM::has_components<Window, Clock>(e) )
+        if ( !EM::has_components<Window, Clock>(e) )
             continue;
 
-        Window &window = EM::get_component<Window>(e);
-        Clock &clock = EM::get_component<Clock>(e);
+        auto &window = EM::get_component<Window>(e);
+        auto &clock = EM::get_component<Clock>(e);
 
         // Manage time
         float excess_seconds = clock.time - glfwGetTime() + clock.min;
-        if(excess_seconds > 0) {
+        if (excess_seconds > 0) {
             int ms = 1000 * excess_seconds;
             std::this_thread::sleep_for( std::chrono::milliseconds(ms) );
         }
@@ -68,10 +69,10 @@ void WindowSystem::run()
 
         //TODO check resize
         if (!window.gl_window)
-            makeWindow(window);
+            MakeWindow(window);
 
         glfwPollEvents();
-        clear();
+        Clear();
         glfwSwapBuffers(window.gl_window);
 
         if(glfwWindowShouldClose(window.gl_window))
@@ -83,7 +84,7 @@ void WindowSystem::run()
     }
 }
 
-bool WindowSystem::hasResized(Window &window)
+bool WindowSystem::HasResized(Window &window)
 {
     // get size of OpenGL window
     int new_width, new_height;
@@ -100,7 +101,7 @@ bool WindowSystem::hasResized(Window &window)
     return false;
 }
 
-void WindowSystem::clear()
+void WindowSystem::Clear()
 {
     // clear screen
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

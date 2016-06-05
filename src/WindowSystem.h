@@ -12,10 +12,10 @@ public:
     void run();
 
 private:
-    void clear();
-    void makeWindow(Window &window);
-    bool hasResized(Window &window);
-    static void keyPress(
+    void Clear();
+    void MakeWindow(Window &window);
+    bool HasResized(Window &window);
+    static void KeyPress(
             GLFWwindow* gl_window,
             int key, int scancode, int action, int mods);
 };
