@@ -1,87 +1,70 @@
 #include <iostream>
+#include <GL/glew.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include "glm.h"
 #include "RenderSystem.h"
+#include "Mesh.h"
+#include "AssetLoader.h"
+
+#define DEBUG 1
 
 void RenderSystem::run()
 {
-    for(int e = 0; e < EM::end(); e++) {
-        if (!EM::has_components<Model, Shader>(e) )
+    // set up the camera
+    for (int e = 0; e < EM::end(); e++) {
+        if (!EM::has_components<Camera>(e))
             continue;
 
-        auto &model  = EM::get_component<Model>(e);
-        auto &shader = EM::get_component<Shader>(e);
+        auto &camera = EM::get_component<Camera>(e);
+        printf("setting up camera\n");
 
-        if (!shader.program)
-            LoadProgram(shader);
+        camera.projection = glm::perspective<GLfloat>(45, 4.0f/3.0f, 0.1f, 1000.0f);
+        camera.modelMatrix = mat4();
 
-    }
-}
+        // update the camera position uniform
+        glUniform3fv(UNIFORM_CAMERA_POSITION, 1, glm::value_ptr(camera.position));
 
-/* Load and compile a shader given a shader type and filename */
-GLuint RenderSystem::LoadShader(GLenum type, const char *filename)
-{
-    // open the shader source
-    FILE *f = fopen(filename, "r");
-    if (!f)
-    {
-        std::cerr << "Unable to open " << filename << " for reading";
-        return 0;
+        // calculate and set the camera matrix from the view and projection
+        camera.cameraMatrix = camera.projection * glm::inverse(camera.modelMatrix);
+
+        glUniformMatrix4fv(UNIFORM_CAMERA_MATRIX, 1, 0, glm::value_ptr(camera.cameraMatrix));
     }
 
-    // read the source
-    fseek(f, 0, SEEK_END);
-    int length = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    GLchar *source = (char*)malloc(length+1);
-    length = fread(source, 1, length, f);
-    fclose(f);
-    ((char*)source)[length] = '\0';
+    for (int e = 0; e < EM::end(); e++) {
 
-    // compile the shader
-    GLuint shader = glCreateShader(type);
-    glShaderSource(shader, 1, (const GLchar**)&source, &length);
-    free(source);
-    glCompileShader(shader);
+        if (!EM::has_components<Model>(e) )
+            continue;
 
-    // check the shader
-    GLint shader_ok;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &shader_ok);
-    if (!shader_ok)
-    {
-        GLint log_length;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
-        char *log = (char*)malloc(log_length);
-        glGetShaderInfoLog(shader, log_length, NULL, log);
-        std::cerr << "Failed to compile " << filename << ".\n" << log;
-        free(log);
-        glDeleteShader(shader);
-        return 0;
+        auto &model = EM::get_component<Model>(e);
+
+        //FIXME this might not belong here
+        if (!model.program)
+            model.program = AL::LoadProgram(model.vs, model.fs);
+        if (!model.vao)
+            model.gen(model);
+
+        // print debug info
+        if (DEBUG) {
+            printf("Drawing entity %d -- ", e);
+            printf("%d vertices -- ", model.num_vertices);
+            printf("program %d -- ", model.program);
+            const float *pSource = (const float*)glm::value_ptr(model.transform);
+            for (int i = 0; i < 16; ++i)
+                std::cout << pSource[i] << ", ";
+            std::cout << std::endl;
+        }
+
+        glUseProgram(model.program);
+
+        // update uniform shader inputs
+        glUniformMatrix4fv(UNIFORM_MODEL, 1, 0, glm::value_ptr(model.transform));
+        //glUniform3fv(VERTEX_UNIFORM_COLOR, 1, glm::value_ptr(model.color));
+
+        // bind vertex array and draw vertices
+        glBindVertexArray(model.vao);
+        glDrawArrays(GL_TRIANGLES, 0, model.num_vertices);
+        glBindVertexArray(0);
     }
-    return shader;
-}
-
-/* Load the program specified by a shader component */
-void RenderSystem::LoadProgram(Shader &shader)
-{
-    // create shader program, compile and attach vertex and fragment shaders
-    GLuint program = glCreateProgram();
-    glAttachShader(program, LoadShader(GL_VERTEX_SHADER, shader.vs));
-    glAttachShader(program, LoadShader(GL_FRAGMENT_SHADER, shader.fs));
-
-    // link and check the program
-    glLinkProgram(program);
-    GLint program_ok;
-    glGetProgramiv(program, GL_LINK_STATUS, &program_ok);
-    if (!program_ok) {
-        GLint log_length;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &log_length);
-        char *log = (char*)malloc(log_length);
-        glGetShaderInfoLog(program, log_length, NULL, log);
-        std::cerr << "Error linking the shader program.\n" << log;
-        free(log);
-        glDeleteProgram(program);
-    }
-
-    // validate and set the program value
-    glValidateProgram(program);
-    shader.program = program;
 }

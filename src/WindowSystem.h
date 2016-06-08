@@ -10,6 +10,7 @@ class WindowSystem {
 public:
     WindowSystem();
     void run();
+    void Display();
 
 private:
     void Clear();

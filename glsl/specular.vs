@@ -3,10 +3,9 @@
 
 layout(location = 0) uniform mat4 camera;
 layout(location = 1) uniform mat4 model;
-layout(location = 2) uniform vec4 colorOverride;
 
 in vec3 Position;
-in vec4 Color;
+in vec3 Color;
 in vec3 Normal;
 
 out vec3 fragPosition;
@@ -17,7 +16,7 @@ void main()
 {
     fragPosition = vec3(model * vec4(Position, 1));
     fragNormal = normalize(transpose(inverse(mat3(model))) * Normal);
-    fragColor = (colorOverride.a == 0) ? Color : colorOverride;
+    fragColor = vec4(Color,1);
 
     gl_Position = camera * vec4(fragPosition, 1);
 }

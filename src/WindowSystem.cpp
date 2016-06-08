@@ -68,12 +68,15 @@ void WindowSystem::run()
         clock.time = newTime;
 
         //TODO check resize
+
+        //FIXME this might not belong here
         if (!window.gl_window)
             MakeWindow(window);
+        else
+            glfwMakeContextCurrent(window.gl_window);
 
         glfwPollEvents();
         Clear();
-        glfwSwapBuffers(window.gl_window);
 
         if(glfwWindowShouldClose(window.gl_window))
         {
@@ -107,3 +110,17 @@ void WindowSystem::Clear()
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
+
+void WindowSystem::Display()
+{
+    for(int e = 0; e < EM::end(); e++) {
+        if ( !EM::has_components<Window, Clock>(e) )
+            continue;
+
+        auto &window = EM::get_component<Window>(e);
+
+        // swap buffers
+        glfwSwapBuffers(window.gl_window);
+    }
+}
+
